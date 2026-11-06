@@ -1,33 +1,65 @@
-// --- DATA STORAGE ---
-let loans = JSON.parse(localStorage.getItem('ibzLoansProV5')) || [];
+// --- IMPORT FIREBASE ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+// --- YOUR FIREBASE CONFIGURATION ---
+// IMPORTANT: Replace the keys below with YOUR actual keys from the Firebase Console!
+const firebaseConfig = {
+  const firebaseConfig = {
+  apiKey: "AIzaSyCwT_-2Af30-PPhWNC08a_yvLbYg-3WvRs",
+  authDomain: "ibz-capital.firebaseapp.com",
+  projectId: "ibz-capital",
+  storageBucket: "ibz-capital.firebasestorage.app",
+  messagingSenderId: "28073595243",
+  appId: "1:28073595243:web:648ddc53d0425b4600fc2e"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const loansCollection = collection(db, "loans");
+
+// Global variables
+let loans = [];
+let savedBank = JSON.parse(localStorage.getItem('ibzBankDetails')); 
 
 // --- PAGE NAVIGATION ---
-function showPage(pageId) {
+window.showPage = function(pageId) {
     document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     document.getElementById(`page-${pageId}`).classList.add('active');
     if(pageId === 'admin-login') document.getElementById('admin-pin').value = '';
 }
 
 // --- ADMIN LOGIN ---
-function loginAdmin() {
+window.loginAdmin = function() {
     const pin = document.getElementById('admin-pin').value;
     if (pin === '2026') {
         showPage('dashboard');
-        updateUI();
     } else { 
         alert('Incorrect PIN.'); 
     }
 }
 
 // --- TOGGLE FORM ---
-function toggleForm() {
+window.toggleForm = function() {
     const form = document.getElementById('add-loan-section');
     form.style.display = form.style.display === 'none' ? 'block' : 'none';
 }
 
+// --- REAL-TIME CLOUD SYNC ---
+onSnapshot(loansCollection, (snapshot) => {
+    loans = [];
+    snapshot.forEach((doc) => {
+        loans.push({ id: doc.id, ...doc.data() });
+    });
+    updateUI();
+});
+
 // --- UPDATE UI ---
 function updateUI() {
     const ledgerList = document.getElementById('ledger-list');
+    if(!ledgerList) return; 
+    
     ledgerList.innerHTML = '';
     
     let totalCapital = 0;
@@ -37,10 +69,10 @@ function updateUI() {
     let totalProfit = 0; 
 
     if (loans.length === 0) {
-        ledgerList.innerHTML = '<p style="text-align:center; color:#a8a29e; padding: 20px;">No active loans.</p>';
+        ledgerList.innerHTML = '<p style="text-align:center; color:#a8a29e; padding: 20px;">No active loans in the cloud.</p>';
     }
 
-    loans.forEach((loan, index) => {
+    loans.forEach((loan) => {
         totalCapital += loan.amount;
         totalExpected += loan.totalOwed;
         totalProfit += loan.interest;
@@ -74,8 +106,8 @@ function updateUI() {
                 <div class="detail-item"><span class="detail-label">Maturity</span><span class="detail-value" style="color: ${isLate ? '#ef4444' : '#fdfbf7'};">${loan.dueDate}</span></div>
             </div>
             <div class="loaner-actions">
-                <button onclick="recordPayment(${index})" class="btn-pay"><i class="fas fa-hand-holding-usd"></i> Record Payment</button>
-                <button onclick="deleteLoan(${index})" class="btn-del"><i class="fas fa-trash"></i></button>
+                <button onclick="recordPayment('${loan.id}', ${loan.balance})" class="btn-pay"><i class="fas fa-hand-holding-usd"></i> Record Payment</button>
+                <button onclick="deleteLoan('${loan.id}')" class="btn-del"><i class="fas fa-trash"></i></button>
             </div>
         `;
         ledgerList.appendChild(card);
@@ -101,12 +133,10 @@ function updateUI() {
     document.getElementById('rating-status').textContent = statusText;
     document.getElementById('rating-status').style.color = statusColor;
     document.getElementById('progress-bar-fill').style.backgroundColor = statusColor;
-
-    localStorage.setItem('ibzLoansProV5', JSON.stringify(loans));
 }
 
-// --- ADD LOAN ---
-document.getElementById('loan-form').addEventListener('submit', (e) => {
+// --- ADD LOAN TO CLOUD ---
+document.getElementById('loan-form').addEventListener('submit', async (e) => {
     e.preventDefault(); 
     const amount = parseFloat(document.getElementById('loan-amount').value);
     const interest = parseFloat(document.getElementById('loan-interest').value);
@@ -123,33 +153,49 @@ document.getElementById('loan-form').addEventListener('submit', (e) => {
         balance: amount + interest
     };
 
-    loans.push(newLoan);
-    document.getElementById('loan-form').reset();
-    document.getElementById('add-loan-section').style.display = 'none';
-    updateUI();
+    try {
+        await addDoc(loansCollection, newLoan);
+        document.getElementById('loan-form').reset();
+        document.getElementById('add-loan-section').style.display = 'none';
+    } catch (error) {
+        alert("Error adding loan: " + error.message);
+    }
 });
 
-// --- RECORD PAYMENT ---
-function recordPayment(index) {
-    const loan = loans[index];
-    const payment = prompt(`How much is ${loan.name} paying? (Balance: R${loan.balance})`);
+// --- RECORD PAYMENT IN CLOUD ---
+window.recordPayment = async function(loanId, currentBalance) {
+    const payment = prompt(`How much are they paying? (Balance: R${currentBalance})`);
     if (payment === null || payment === '') return;
     const payAmount = parseFloat(payment);
-    if (isNaN(payAmount) || payAmount <= 0 || payAmount > loan.balance) {
+    
+    if (isNaN(payAmount) || payAmount <= 0 || payAmount > currentBalance) {
         alert("Invalid amount."); return;
     }
-    loan.balance -= payAmount;
-    if (loan.balance === 0) { alert(`🎉 ${loan.name} has fully paid!`); loans.splice(index, 1); }
-    updateUI();
+    
+    const newBalance = currentBalance - payAmount;
+    const loanRef = doc(db, "loans", loanId);
+
+    try {
+        if (newBalance === 0) { 
+            alert(`🎉 They have fully paid!`); 
+            await deleteDoc(loanRef); 
+        } else {
+            await updateDoc(loanRef, { balance: newBalance });
+        }
+    } catch (error) {
+        alert("Error updating payment: " + error.message);
+    }
 }
 
-// --- DELETE LOAN ---
-function deleteLoan(index) {
-    if (confirm("Delete this loan permanently?")) { loans.splice(index, 1); updateUI(); }
+// --- DELETE LOAN FROM CLOUD ---
+window.deleteLoan = async function(loanId) {
+    if (confirm("Delete this loan permanently from the cloud?")) { 
+        await deleteDoc(doc(db, "loans", loanId)); 
+    }
 }
 
 // --- ADMIN SETTINGS ---
-function openSettings() {
+window.openSettings = function() {
     const savedSettings = JSON.parse(localStorage.getItem('ibzBankDetails'));
     if (savedSettings) {
         document.getElementById('set-bank-name').value = savedSettings.bankName;
@@ -167,12 +213,12 @@ document.getElementById('settings-form').addEventListener('submit', (e) => {
         accNum: document.getElementById('set-acc-num').value
     };
     localStorage.setItem('ibzBankDetails', JSON.stringify(bankDetails));
-    alert('✅ Banking details saved securely!');
+    alert('✅ Banking details saved securely on this device!');
     showPage('dashboard');
 });
 
 // --- CLIENT PORTAL ---
-function findClientLoan() {
+window.findClientLoan = function() {
     const searchPhone = document.getElementById('client-search-phone').value.trim();
     
     if (!searchPhone) {
@@ -180,7 +226,6 @@ function findClientLoan() {
         return;
     }
 
-    // This pulls the REAL details from Settings
     const savedBank = JSON.parse(localStorage.getItem('ibzBankDetails'));
     const clientLoan = loans.find(loan => loan.phone === searchPhone);
     const resultArea = document.getElementById('client-result-area');
@@ -189,7 +234,6 @@ function findClientLoan() {
         const isLate = new Date() > new Date(clientLoan.dueDate) && clientLoan.balance > 0;
         const formatR = (amount) => `R${amount.toFixed(2)}`;
 
-        // Fallbacks in case you haven't saved settings yet
         const bankName = savedBank ? savedBank.bankName : 'Not Set';
         const accName = savedBank ? savedBank.accName : 'Not Set';
         const accNum = savedBank ? savedBank.accNum : 'Not Set';
@@ -224,7 +268,7 @@ function findClientLoan() {
 }
 
 // --- WHATSAPP INTEGRATION ---
-function sendWhatsAppProof(clientName, balance) {
+window.sendWhatsAppProof = function(clientName, balance) {
     const adminPhone = '27658291242'; 
     const message = `Hello IBZ Capital, this is ${clientName}. I have just made a payment towards my balance of R${balance}. Here is my proof of payment.`;
     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
