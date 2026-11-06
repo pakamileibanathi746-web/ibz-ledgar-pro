@@ -5,7 +5,6 @@ import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc
 // --- YOUR FIREBASE CONFIGURATION ---
 // IMPORTANT: Replace the keys below with YOUR actual keys from the Firebase Console!
 const firebaseConfig = {
-  const firebaseConfig = {
   apiKey: "AIzaSyCwT_-2Af30-PPhWNC08a_yvLbYg-3WvRs",
   authDomain: "ibz-capital.firebaseapp.com",
   projectId: "ibz-capital",
