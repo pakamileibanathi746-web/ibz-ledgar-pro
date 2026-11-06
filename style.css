@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+body { background: linear-gradient(135deg, #1c1917 0%, #292524 100%); color: #fdfbf7; min-height: 100vh; padding: 20px; }
+
+.page { display: none; animation: slideUp 0.4s ease-out; }
+.page.active { display: block; }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.glass-container { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 30px; }
+.landing-box { max-width: 400px; margin: 10vh auto; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+
+.hero-logo { width: 90px; height: 90px; border-radius: 24px; margin-bottom: 20px; box-shadow: 0 10px 20px rgba(245, 158, 11, 0.2); }
+.hero-title { font-size: 32px; font-weight: 800; color: #fdfbf7; letter-spacing: -1px; }
+.hero-title span { color: #f59e0b; }
+.hero-subtitle { color: #a8a29e; font-size: 14px; margin-bottom: 40px; }
+.login-options { display: flex; flex-direction: column; gap: 15px; }
+
+.btn-primary, .btn-secondary { width: 100%; padding: 16px; border-radius: 16px; font-weight: 600; font-size: 16px; cursor: pointer; border: none; transition: all 0.3s ease; display: flex; justify-content: center; align-items: center; gap: 10px; }
+.btn-primary { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #1c1917; box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3); }
+.btn-primary:hover { transform: translateY(-2px); }
+.btn-secondary { background: rgba(255, 255, 255, 0.05); color: #fdfbf7; border: 1px solid rgba(255, 255, 255, 0.1); }
+.btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
+.btn-small { background: #f59e0b; color: #1c1917; border: none; padding: 8px 15px; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 5px;}
+.back-btn { background: none; border: none; color: #a8a29e; font-size: 14px; cursor: pointer; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+.modern-input, input[type="text"], input[type="tel"], input[type="number"], input[type="date"], input[type="password"] { width: 100%; padding: 14px; background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; color: #fdfbf7; font-size: 14px; margin-bottom: 12px; transition: 0.3s; }
+input:focus { outline: none; border-color: #f59e0b; background: rgba(0, 0, 0, 0.5); }
+.input-row { display: flex; gap: 10px; }
+.input-label { display: block; font-size: 11px; color: #a8a29e; margin-bottom: 5px; margin-left: 5px; }
+
+.dashboard-header { display: flex; justify-content: space-between; align-items: center; max-width: 800px; margin: 0 auto 20px auto; }
+.dashboard-header h1 { font-size: 24px; font-weight: 800; color: #f59e0b; }
+.dashboard-header p { font-size: 12px; color: #a8a29e; }
+.logout-btn { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 8px 15px; border-radius: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+.logout-btn:hover { background: rgba(239, 68, 68, 0.2); }
+
+.dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 800px; margin: 0 auto 30px auto; }
+.stat-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); padding: 15px; border-radius: 16px; }
+.stat-card.highlight-card { grid-column: span 2; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%); border-color: rgba(245, 158, 11, 0.3); }
+
+/* Health Card */
+.health-card { grid-column: span 2; border-color: rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05); }
+.health-card p { color: #10b981; font-size: 28px; font-weight: 800; }
+.health-card span { font-size: 12px; font-weight: 600; color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 3px 8px; border-radius: 6px; }
+.progress-bar-bg { width: 100%; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; margin-top: 10px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: #10b981; width: 0%; transition: width 0.5s ease; }
+
+.stat-card h3 { font-size: 11px; color: #a8a29e; text-transform: uppercase; letter-spacing: 1px; }
+.stat-card p { font-size: 22px; font-weight: 800; margin-top: 5px; }
+
+.content-card { background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 24px; max-width: 800px; margin: 0 auto; }
+.content-card h2 { font-size: 18px; color: #fdfbf7; }
+
+/* --- NEW BIG CARD LAYOUT --- */
+.loaners-list { display: flex; flex-direction: column; gap: 15px; }
+
+.loaner-card {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-left: 5px solid #f59e0b;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.loaner-card.overdue { border-left-color: #ef4444; }
+
+.loaner-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.loaner-name { font-size: 18px; font-weight: 800; color: #fdfbf7; margin-bottom: 5px; }
+.loaner-contact { font-size: 13px; color: #a8a29e; display: flex; flex-direction: column; gap: 4px; }
+.loaner-balance { text-align: right; }
+.loaner-balance h4 { font-size: 11px; color: #a8a29e; text-transform: uppercase; }
+.loaner-balance p { font-size: 22px; font-weight: 800; color: #f59e0b; }
+
+.loaner-details-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: rgba(255,255,255,0.03);
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.detail-item { display: flex; flex-direction: column; gap: 3px; }
+.detail-label { color: #a8a29e; font-size: 10px; text-transform: uppercase; }
+.detail-value { color: #fdfbf7; font-weight: 600; }
+
+.loaner-actions { display: flex; gap: 10px; margin-top: 5px; }
+.loaner-actions button { flex: 1; padding: 12px; border-radius: 10px; border: none; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 8px; }
+.btn-pay { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.btn-pay:hover { background: rgba(16, 185, 129, 0.25); }
+.btn-del { background: rgba(239, 68, 68, 0.15); color: #ef4444; flex: 0.3 !important; }
+.btn-del:hover { background: rgba(239, 68, 68, 0.25); }

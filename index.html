@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBZ Capital</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ================= PAGE 1: LANDING ================= -->
+    <div id="page-landing" class="page active">
+        <div class="glass-container landing-box">
+            <img src="assets/logo.png" alt="IBZ Logo" class="hero-logo">
+            <h1 class="hero-title">IBZ <span>Capital</span></h1>
+            <p class="hero-subtitle">Warm Tech. Secure Capital.</p>
+            
+            <div class="login-options">
+                <button onclick="showPage('admin-login')" class="btn-primary">
+                    <i class="fas fa-user-shield"></i> Admin Portal
+                </button>
+                <button onclick="showPage('client-login')" class="btn-secondary">
+                    <i class="fas fa-user"></i> Client Portal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 2: ADMIN LOGIN ================= -->
+    <div id="page-admin-login" class="page">
+        <div class="glass-container landing-box">
+            <button onclick="showPage('landing')" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="margin-bottom: 10px;">Admin Access</h2>
+            <p class="sub-text" style="color: #a8a29e; font-size: 14px; margin-bottom: 20px;">Authorized personnel only.</p>
+            
+            <input type="password" placeholder="Enter Admin PIN" class="modern-input" id="admin-pin" style="text-align: center; letter-spacing: 5px;">
+            <button onclick="loginAdmin()" class="btn-primary">Access Dashboard</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 3: ADMIN DASHBOARD ================= -->
+    <div id="page-dashboard" class="page">
+        <header class="dashboard-header">
+            <div>
+                <h1>IBZ Capital</h1>
+                <p>Financial Health Dashboard</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button onclick="openSettings()" class="logout-btn" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2);"><i class="fas fa-cog"></i> Settings</button>
+                <button onclick="showPage('landing')" class="logout-btn"><i class="fas fa-lock"></i> Lock</button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <h3>Total Disbursed</h3>
+                <p id="total-capital">R0.00</p>
+            </div>
+            <div class="stat-card">
+                <h3>Total Collected</h3>
+                <p id="total-collected">R0.00</p>
+            </div>
+            <div class="stat-card highlight-card">
+                <h3>Active Portfolio (Outstanding)</h3>
+                <p id="total-outstanding">R0.00</p>
+            </div>
+            <div class="stat-card health-card">
+                <h3>Collection Rate (Health)</h3>
+                <div style="display: flex; align-items: baseline; gap: 10px;">
+                    <p id="collection-rate">0%</p>
+                    <span id="rating-status">No Data</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div id="progress-bar-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>Projected Profit</h3>
+                <p id="total-profit">R0.00</p>
+            </div>
+        </div>
+
+        <div class="content-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>Active Loaners</h2>
+                <button onclick="toggleForm()" class="btn-small"><i class="fas fa-plus"></i> New Loan</button>
+            </div>
+
+            <div id="add-loan-section" class="form-container" style="display: none;">
+                <form id="loan-form">
+                    <input type="text" id="borrower-name" placeholder="Full Name" required>
+                    <input type="tel" id="borrower-phone" placeholder="Phone Number (e.g. 065...)" required>
+                    <input type="text" id="borrower-id" placeholder="ID Number (Optional)">
+                    <div class="input-row">
+                        <input type="number" id="loan-amount" placeholder="Principal (R)" required>
+                        <input type="number" id="loan-interest" placeholder="Interest (R)" required>
+                    </div>
+                    <label class="input-label">Disbursed Date</label>
+                    <input type="date" id="date-borrowed" required>
+                    <label class="input-label">Maturity Date</label>
+                    <input type="date" id="due-date" required>
+                    <button type="submit" class="btn-primary" style="padding: 12px; font-size: 14px;"><i class="fas fa-save"></i> Add to Ledger</button>
+                </form>
+            </div>
+
+            <div id="ledger-list" class="loaners-list"></div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 4: CLIENT LOGIN ================= -->
+    <div id="page-client-login" class="page">
+        <div class="glass-container landing-box">
+            <button onclick="showPage('landing')" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+            <h2 style="margin-bottom: 10px;">Client Portal</h2>
+            <p class="sub-text" style="color: #a8a29e; font-size: 14px; margin-bottom: 20px;">Enter your phone number to view your balance.</p>
+            
+            <input type="tel" id="client-search-phone" placeholder="e.g. 0658291242" class="modern-input" style="text-align: center;">
+            <button onclick="findClientLoan()" class="btn-primary"><i class="fas fa-search"></i> Check My Balance</button>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 5: CLIENT DASHBOARD ================= -->
+    <div id="page-client-dashboard" class="page">
+        <div class="glass-container landing-box" style="margin-top: 5vh;">
+            <button onclick="showPage('client-login')" class="back-btn"><i class="fas fa-arrow-left"></i> Logout</button>
+            <div id="client-result-area"></div>
+        </div>
+    </div>
+
+    <!-- ================= PAGE 6: ADMIN SETTINGS ================= -->
+    <div id="page-admin-settings" class="page">
+        <div class="glass-container landing-box" style="margin-top: 5vh;">
+            <button onclick="showPage('dashboard')" class="back-btn"><i class="fas fa-arrow-left"></i> Back to Dashboard</button>
+            <h2 style="margin-bottom: 20px;">Business Settings</h2>
+            <p class="sub-text" style="color: #a8a29e; font-size: 13px; margin-bottom: 20px; text-align: left;">These details will be shown to your clients when they log in to pay.</p>
+            
+            <form id="settings-form">
+                <label class="input-label">Bank Name</label>
+                <input type="text" id="set-bank-name" placeholder="e.g. Capitec" required>
+                <label class="input-label">Account Name</label>
+                <input type="text" id="set-acc-name" placeholder="e.g. I. Pakamile" required>
+                <label class="input-label">Account Number</label>
+                <input type="text" id="set-acc-num" placeholder="e.g. 123456789" required>
+                <button type="submit" class="btn-primary" style="margin-top: 15px;"><i class="fas fa-save"></i> Save Details</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
