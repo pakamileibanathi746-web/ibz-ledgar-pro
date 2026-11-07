@@ -3,7 +3,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getFirestore, collection, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 // --- YOUR FIREBASE CONFIGURATION ---
-// IMPORTANT: Replace the keys below with YOUR actual keys from the Firebase Console!
 const firebaseConfig = {
   apiKey: "AIzaSyCwT_-2Af30-PPhWNC08a_yvLbYg-3WvRs",
   authDomain: "ibz-capital.firebaseapp.com",
@@ -212,7 +211,7 @@ document.getElementById('settings-form').addEventListener('submit', (e) => {
         accNum: document.getElementById('set-acc-num').value
     };
     localStorage.setItem('ibzBankDetails', JSON.stringify(bankDetails));
-    alert('✅ Banking details saved securely on this device!');
+    alert('✅ Banking details saved securely!');
     showPage('dashboard');
 });
 
@@ -256,7 +255,7 @@ window.findClientLoan = function() {
                 <p style="font-size: 11px; color: #f59e0b;">Reference: <strong>${clientLoan.name}</strong></p>
             </div>
 
-            <button onclick="sendWhatsAppProof('${clientLoan.name}', '${clientLoan.balance}')" class="btn-primary" style="background: #25D366; color: white; box-shadow: none;">
+            <button onclick="sendWhatsAppProof('${clientLoan.name}', '${clientLoan.balance}')" class="btn-primary" style="background: #25D366; color: white; box-shadow: none; margin-top: 10px;">
                 <i class="fab fa-whatsapp"></i> Send Proof of Payment
             </button>
         `;
@@ -266,9 +265,24 @@ window.findClientLoan = function() {
     }
 }
 
-// --- WHATSAPP INTEGRATION ---
+// --- WHATSAPP INTEGRATION (PROFESSIONAL) ---
 window.sendWhatsAppProof = function(clientName, balance) {
     const adminPhone = '27658291242'; 
-    const message = `Hello IBZ Capital, this is ${clientName}. I have just made a payment towards my balance of R${balance}. Here is my proof of payment.`;
+    const message = `Good day IBZ Capital,\n\nThis is ${clientName}. I am writing to confirm that I have made a payment towards my outstanding balance of R${balance}.\n\nPlease find my proof of payment attached for your records.\n\nThank you.`;
     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
 }
+
+// --- FIX: Prevent Pull-to-Refresh & Enable Enter Key ---
+document.addEventListener('DOMContentLoaded', () => {
+    document.body.style.overscrollBehaviorY = 'contain';
+
+    const formInputs = document.querySelectorAll('#loan-form input');
+    formInputs.forEach(input => {
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('loan-form').requestSubmit();
+            }
+        });
+    });
+});
