@@ -272,17 +272,23 @@ window.sendWhatsAppProof = function(clientName, balance) {
     window.open(`https://wa.me/${adminPhone}?text=${encodeURIComponent(message)}`, '_blank');
 }
 
-// --- FIX: Prevent Pull-to-Refresh & Enable Enter Key ---
-document.addEventListener('DOMContentLoaded', () => {
+// --- BULLETPROOF ENTER KEY & REFRESH FIX ---
+window.addEventListener('load', () => {
+    // 1. Stop the screen from bouncing/refreshing on mobile
     document.body.style.overscrollBehaviorY = 'contain';
 
-    const formInputs = document.querySelectorAll('#loan-form input');
-    formInputs.forEach(input => {
-        input.addEventListener('keydown', (e) => {
+    // 2. Listen for the Enter key anywhere in the loan form
+    const loanForm = document.getElementById('loan-form');
+    if (loanForm) {
+        loanForm.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                e.preventDefault();
-                document.getElementById('loan-form').requestSubmit();
+                e.preventDefault(); // Stop default behavior
+                e.stopPropagation(); // Stop event bubbling
+                
+                // Find the submit button and click it programmatically
+                const submitBtn = loanForm.querySelector('button[type="submit"]');
+                if (submitBtn) submitBtn.click();
             }
         });
-    });
+    }
 });
